@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from app.schemas.user_schema import UserRegister, UserLogin
 
 router = APIRouter(
     prefix="/auth",
@@ -6,9 +7,15 @@ router = APIRouter(
 )
 
 @router.post("/login")
-def login():
-    return {"message": "Login successful"}
+def login(user: UserLogin):
+    return {
+        "message": "Login successful",
+        "email": user.email
+    }
 
 @router.post("/register")
-def register():
-    return {"message": "User registered"}
+def register(user: UserRegister):
+    return {
+        "message": "User registered",
+        "email": user.email
+    }
