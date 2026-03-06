@@ -14,6 +14,8 @@ from app.routers.milestone_router import router as milestone_router
 from app.routers.project_router import router as project_router
 from app.routers.submission_router import router as submission_router
 from app.routers.task_router import router as task_router
+from app.routers.projects import router as projects_router
+from app.routers.tasks import router as tasks_router
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -34,6 +36,8 @@ app.include_router(milestone_router)
 app.include_router(project_router)
 app.include_router(submission_router)
 app.include_router(task_router)
+app.include_router(projects_router)
+app.include_router(tasks_router)
 
 # Root endpoint
 @app.get("/")
