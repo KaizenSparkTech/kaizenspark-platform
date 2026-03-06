@@ -1,17 +1,19 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 from datetime import datetime
 
-class UserCreate(BaseModel):
+class LeadCreate(BaseModel):
     name: str
     email: EmailStr
-    password: str
-    role: str
+    company: Optional[str] = None
+    status: Optional[str] = "new"
 
-class UserResponse(BaseModel):
+class LeadResponse(BaseModel):
     id: int
     name: str
     email: EmailStr
-    role: str
+    company: Optional[str] = None
+    status: str
     created_at: datetime
 
     class Config:
