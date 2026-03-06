@@ -1,73 +1,56 @@
-# Welcome to your Lovable project
+# KaizenSpark Enterprise Frontend
 
-## Project info
+Welcome to the frontend repository for KaizenSpark Enterprise. This project is a modern, responsive, and highly interactive web application designed with a premium aesthetic and smooth user experience.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## ✨ Key Features
+- **Premium UI/UX:** Built with modern design principles, including glassmorphism, dynamic animations, and a sleek dark theme.
+- **Responsive Layout:** Fully functional and visually appealing across all device sizes.
+- **Component-Driven:** Utilizing robust UI components powered by Radix UI and shadcn-ui.
+- **Fluid Animations:** Smooth micro-interactions and transitions using Framer Motion.
+- **Robust Routing:** Client-side routing with React Router.
 
-## How can I edit this code?
+## 🛠️ Technology Stack
+- **Framework:** React 18
+- **Build Tool:** Vite
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **UI Components:** shadcn-ui, Radix UI Primitives
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
 
-There are several ways of editing your application.
+## 🚀 Getting Started
 
-**Use Lovable**
+Follow these steps to run the application locally.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) (v18 or higher recommended) and npm installed.
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation
 
-**Use your preferred IDE**
+1. **Clone the repository** (if not already local):
+   ```bash
+   git clone <repository-url>
+   cd kaizenspark-enterprise-main
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+   *Note: This project also contains a `bun.lockb` file, so you can optionally use [Bun](https://bun.sh/) (`bun install`) if you prefer.*
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
-Follow these steps:
+4. **Access the application:**
+   Open your browser and navigate to `http://localhost:5173` (or the port specified in your terminal).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📦 Available Scripts
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- `npm run dev` - Starts the Vite development server.
+- `npm run build` - Builds the application for production.
+- `npm run preview` - Previews the production build locally.
+- `npm run lint` - Runs ESLint to check for code quality issues.
+- `npm run test` - Runs the Vitest test suite.
