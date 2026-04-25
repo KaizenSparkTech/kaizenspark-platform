@@ -16,12 +16,12 @@ from app.routers.submission_router import router as submission_router
 from app.routers.task_router import router as task_router
 from app.routers.projects import router as projects_router
 from app.routers.tasks import router as tasks_router
-from app.routers.auth import router as auth_router
+from app.routers.auth import router as auth_router  # ✅ your auth
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
 
-# Initialize FastAPI
+# Initialize FastAPI app
 app = FastAPI(title="KaizenSpark Platform API")
 
 # Include all routers
@@ -39,7 +39,7 @@ app.include_router(submission_router)
 app.include_router(task_router)
 app.include_router(projects_router)
 app.include_router(tasks_router)
-app.include_router(auth_router)
+app.include_router(auth_router)  # ✅ your part
 
 # Root endpoint
 @app.get("/")
