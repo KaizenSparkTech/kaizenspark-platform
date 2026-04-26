@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-apps/web/node_modules
+node_modules
 dist
 dist-ssr
 *.local
@@ -22,20 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-# Python
-apps/api/.venv/
-**/__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
-
-# Node / Vite
-apps/web/node_modules/
-apps/web/dist/
-apps/web/.vite/
-*.tsbuildinfo
-# IDE
-.idea/
-.vscode/
-Thumbs.db
