@@ -2,19 +2,32 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
 class InternTaskCreate(BaseModel):
-    task_name: str
-    description: Optional[str] = None
     intern_id: int
-    due_date: Optional[datetime] = None
+    title: str
+    description: Optional[str] = None
+
+
+class InternTaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    github_link: Optional[str] = None
+    status: Optional[str] = None
+    score: Optional[int] = None
+    reviewed_by: Optional[int] = None
+
 
 class InternTaskResponse(BaseModel):
     id: int
-    task_name: str
-    description: Optional[str] = None
     intern_id: int
-    due_date: Optional[datetime] = None
+    title: str
+    description: Optional[str] = None
+    github_link: Optional[str] = None
+    submission_date: Optional[datetime] = None
+    status: str
+    score: int
+    reviewed_by: Optional[int] = None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

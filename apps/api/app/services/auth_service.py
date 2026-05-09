@@ -1,41 +1,83 @@
+"""JWT-based authentication service."""
+
+from datetime import datetime, timedelta, timezone
+
+from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+
+from app.config import get_settings
 from app.models.user import User
-from app.services.user_service import create_user
 from app.schemas.user_schema import UserCreate
-from passlib.context import CryptContext
+from app.services.user_service import create_user, get_user_by_email, verify_password
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+settings = get_settings()
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
 
-def register_user(db: Session, email: str, password: str):
-    # Check if user exists
-    existing = db.query(User).filter(User.email == email).first()
-    if existing:
-        return {"error": "User already exists"}
-
-    # Use existing user_service to create user
-    # Note: UserCreate requires name and role, so we'll use defaults if not provided
-    user_data = UserCreate(
-        name=email.split("@")[0],
-        email=email,
-        password=password,
-        role="user"
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (
+        expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, settings.JWT_SECRET, algorithm=settings.JWT_ALGORITHM)
+
+
+def decode_access_token(token: str) -> dict | None:
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        return payload
+    except JWTError:
+        return None
+
+
+def register_user(db: Session, name: str, email: str, password: str, role: str = "client"):
+    """Register a new user and return a JWT token."""
+    existing = get_user_by_email(db, email)
+    if existing:
+        return {"error": "User with this email already exists"}
+
+    # Auto-detect intern role from email domain
+    intern_domain = settings.INTERN_EMAIL_DOMAIN
+    if intern_domain and email.endswith(f"@{intern_domain}"):
+        role = "intern"
+
+    user_data = UserCreate(name=name, email=email, password=password, role=role)
     new_user = create_user(db, user_data)
     if not new_user:
         return {"error": "Failed to create user"}
 
-    return {"message": "User registered successfully"}
+    token = create_access_token({"sub": str(new_user.id), "role": new_user.role})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email,
+            "role": new_user.role,
+            "created_at": new_user.created_at.isoformat() if new_user.created_at else None,
+        },
+    }
+
 
 def login_user(db: Session, email: str, password: str):
-    user = db.query(User).filter(User.email == email).first()
-
+    """Authenticate user and return a JWT token."""
+    user = get_user_by_email(db, email)
     if not user:
-        return {"error": "User not found"}
+        return {"error": "Invalid email or password"}
 
-    if not verify_password(password, user.password_hash):
-        return {"error": "Invalid password"}
+    if not verify_password(password, user.password):
+        return {"error": "Invalid email or password"}
 
-    return {"message": "Login successful"}
+    token = create_access_token({"sub": str(user.id), "role": user.role})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+            "created_at": user.created_at.isoformat() if user.created_at else None,
+        },
+    }
