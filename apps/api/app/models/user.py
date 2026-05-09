@@ -25,6 +25,8 @@ class User(Base):
     avatar_url = Column(String(500), nullable=True)
     employee_id = Column(String(20), unique=True, nullable=True)  # KS-EMP-001
     date_of_joining = Column(Date, nullable=True)
+    employment_type = Column(String(50), nullable=True)  # intern, full_time, contract, part_time
+    internship_end_date = Column(Date, nullable=True)
     status = Column(String(20), default="active")  # active, onboarding, inactive, terminated, on_leave
     is_verified = Column(Boolean, default=False)
 

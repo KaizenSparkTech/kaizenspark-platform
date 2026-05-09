@@ -11,6 +11,8 @@ class OfferLetterCreate(BaseModel):
     role_offered: str
     department_id: Optional[int] = None
     designation_id: Optional[int] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
     salary_offered: Optional[float] = None
     joining_date: Optional[date] = None
     offer_expiry_date: Optional[date] = None
@@ -23,6 +25,8 @@ class OfferLetterUpdate(BaseModel):
     role_offered: Optional[str] = None
     department_id: Optional[int] = None
     designation_id: Optional[int] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
     salary_offered: Optional[float] = None
     joining_date: Optional[date] = None
     offer_expiry_date: Optional[date] = None
@@ -41,6 +45,8 @@ class OfferLetterResponse(BaseModel):
     role_offered: str
     department_id: Optional[int] = None
     designation_id: Optional[int] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
     salary_offered: Optional[float] = None
     joining_date: Optional[date] = None
     offer_expiry_date: Optional[date] = None

@@ -18,6 +18,7 @@ class ProjectRequestCreate(BaseModel):
 class ProjectRequestReview(BaseModel):
     status: str  # under_review, approved, rejected
     rejection_reason: Optional[str] = None
+    allocated_department_id: Optional[int] = None
 
 
 class ProjectRequestResponse(BaseModel):
@@ -33,6 +34,7 @@ class ProjectRequestResponse(BaseModel):
     status: str
     reviewed_by: Optional[int] = None
     approved_by: Optional[int] = None
+    allocated_department_id: Optional[int] = None
     rejection_reason: Optional[str] = None
     created_at: datetime
 

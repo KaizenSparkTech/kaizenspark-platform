@@ -21,6 +21,7 @@ class ProjectRequest(Base):
     status = Column(String(30), default="submitted")  # submitted, under_review, approved, rejected, converted
     reviewed_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     approved_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    allocated_department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True)
     rejection_reason = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -29,4 +30,5 @@ class ProjectRequest(Base):
     client = relationship("User", foreign_keys=[client_id])
     reviewer = relationship("User", foreign_keys=[reviewed_by])
     approver = relationship("User", foreign_keys=[approved_by])
+    allocated_department = relationship("Department", foreign_keys=[allocated_department_id])
     project = relationship("Project", back_populates="project_request", uselist=False)

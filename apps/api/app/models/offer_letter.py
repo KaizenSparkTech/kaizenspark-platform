@@ -15,6 +15,8 @@ class OfferLetter(Base):
     role_offered = Column(String(50), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True)
     designation_id = Column(Integer, ForeignKey("designations.id", ondelete="SET NULL"), nullable=True)
+    employment_type = Column(String(50), nullable=True)  # intern, full_time, contract
+    internship_end_date = Column(Date, nullable=True)
     salary_offered = Column(Numeric(12, 2), nullable=True)
     joining_date = Column(Date, nullable=True)
     offer_expiry_date = Column(Date, nullable=True)

@@ -17,6 +17,8 @@ class UserCreate(BaseModel):
     reporting_to: Optional[int] = None
     employee_id: Optional[str] = None
     date_of_joining: Optional[date] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
 
 
 class UserRegister(BaseModel):
@@ -43,6 +45,8 @@ class UserUpdate(BaseModel):
     reporting_to: Optional[int] = None
     employee_id: Optional[str] = None
     date_of_joining: Optional[date] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
     status: Optional[str] = None
     is_verified: Optional[bool] = None
     onboarding_status: Optional[str] = None
@@ -78,6 +82,8 @@ class UserResponse(BaseModel):
     team_id: Optional[int] = None
     reporting_to: Optional[int] = None
     date_of_joining: Optional[date] = None
+    employment_type: Optional[str] = None
+    internship_end_date: Optional[date] = None
     status: str = "active"
     is_verified: bool = False
     # Personal / onboarding fields

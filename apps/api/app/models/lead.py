@@ -10,4 +10,5 @@ class Lead(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(100), nullable=False)
     message = Column(Text, nullable=False)
+    status = Column(String(30), default="pending")  # pending, invited, rejected
     created_at = Column(DateTime(timezone=True), server_default=func.now())

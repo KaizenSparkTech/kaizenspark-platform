@@ -14,6 +14,14 @@ class LeadResponse(BaseModel):
     name: str
     email: EmailStr
     message: str
+    status: str
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class LeadInviteResponse(BaseModel):
+    lead: LeadResponse
+    generated_email: str
+    generated_password: str
+    message: str
