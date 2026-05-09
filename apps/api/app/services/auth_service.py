@@ -31,15 +31,13 @@ def decode_access_token(token: str) -> dict | None:
 
 
 def register_user(db: Session, name: str, email: str, password: str, role: str = "client"):
-    """Register a new user and return a JWT token."""
+    """Register a new user — only client role allowed for public registration."""
     existing = get_user_by_email(db, email)
     if existing:
         return {"error": "User with this email already exists"}
 
-    # Auto-detect intern role from email domain
-    intern_domain = settings.INTERN_EMAIL_DOMAIN
-    if intern_domain and email.endswith(f"@{intern_domain}"):
-        role = "intern"
+    # Force client role for public registration
+    role = "client"
 
     user_data = UserCreate(name=name, email=email, password=password, role=role)
     new_user = create_user(db, user_data)
@@ -55,6 +53,10 @@ def register_user(db: Session, name: str, email: str, password: str, role: str =
             "name": new_user.name,
             "email": new_user.email,
             "role": new_user.role,
+            "status": new_user.status or "active",
+            "onboarding_status": new_user.onboarding_status or "none",
+            "temp_password_changed": True,
+            "is_verified": new_user.is_verified or False,
             "created_at": new_user.created_at.isoformat() if new_user.created_at else None,
         },
     }
@@ -78,6 +80,11 @@ def login_user(db: Session, email: str, password: str):
             "name": user.name,
             "email": user.email,
             "role": user.role,
+            "status": user.status or "active",
+            "onboarding_status": user.onboarding_status or "none",
+            "temp_password_changed": user.temp_password_changed if user.temp_password_changed is not None else True,
+            "is_verified": user.is_verified or False,
+            "personal_email": user.personal_email,
             "created_at": user.created_at.isoformat() if user.created_at else None,
         },
     }

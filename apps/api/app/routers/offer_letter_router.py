@@ -1,9 +1,12 @@
-"""OfferLetter router with RBAC — HR creates/sends, candidates accept/reject."""
+"""OfferLetter router with RBAC — Super Admin/HR creates/sends, candidates accept/reject."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.schemas.offer_letter_schema import OfferLetterCreate, OfferLetterUpdate, OfferLetterAccept, OfferLetterResponse
+from app.schemas.offer_letter_schema import (
+    OfferLetterCreate, OfferLetterUpdate, OfferLetterAccept,
+    OfferLetterResponse, SendOfferResponse,
+)
 from app.services.offer_letter_service import (
     get_offer_letters, get_offer_letter_by_id, create_offer_letter,
     update_offer_letter, send_offer_letter, accept_offer_letter, reject_offer_letter,
@@ -17,7 +20,7 @@ router = APIRouter(prefix="/offer-letters", tags=["Offer Letters"])
 
 @router.get("/", response_model=list[OfferLetterResponse])
 def list_offer_letters(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    # HR/super_admin see all; employees/interns see only their own
+    # Super Admin/HR see all; other users see only offers linked to them
     if current_user.role in ("super_admin", "hr"):
         return get_offer_letters(db)
     from app.services.offer_letter_service import get_offer_letter_by_email
@@ -45,12 +48,18 @@ def update_offer(offer_id: int, data: OfferLetterUpdate, db: Session = Depends(g
     return result
 
 
-@router.post("/{offer_id}/send", response_model=OfferLetterResponse)
-def send_offer(offer_id: int, db: Session = Depends(get_db), _: User = Depends(require_role("super_admin", "hr"))):
-    result = send_offer_letter(db, offer_id)
+@router.post("/{offer_id}/send")
+def send_offer(offer_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_role("super_admin", "hr"))):
+    """Send offer — auto-creates a user account. Returns generated credentials (shown once)."""
+    result = send_offer_letter(db, offer_id, sent_by_user_id=current_user.id)
     if not result:
         raise HTTPException(status_code=400, detail="Cannot send — offer must be in draft status")
-    return result
+    return {
+        "offer": OfferLetterResponse.model_validate(result["offer"]),
+        "generated_email": result["generated_email"],
+        "generated_password": result["generated_password"],
+        "message": f"Offer sent! User account created. Share these credentials with {result['offer'].candidate_name}:",
+    }
 
 
 @router.post("/{offer_id}/accept", response_model=OfferLetterResponse)

@@ -151,7 +151,9 @@ def root():
 
 @app.post("/api/v1/dev/seed")
 def seed_data():
-    """Seed the database with sample data for all 12 roles."""
+    """Seed the database with the Super Admin — the company owner.
+    All other users are created through the offer letter flow.
+    """
     from sqlalchemy.orm import Session
     from app.database.connection import SessionLocal
     from app.services.user_service import create_user, get_user_by_email
@@ -159,64 +161,32 @@ def seed_data():
 
     db: Session = SessionLocal()
     try:
-        seed_users = [
-            ("Super Admin", "admin@kaizenspark.com", "admin123", "super_admin"),
-            ("HR Manager", "hr@kaizenspark.com", "hr123", "hr"),
-            ("General Manager", "manager@kaizenspark.com", "manager123", "manager"),
-            ("Business Analyst", "ba@kaizenspark.com", "ba123", "business_analyst"),
-            ("Project Manager", "pm@kaizenspark.com", "pm123", "project_manager"),
-            ("Team Lead", "lead@kaizenspark.com", "lead123", "team_lead"),
-            ("Employee One", "employee@kaizenspark.com", "emp123", "employee"),
-            ("Developer One", "dev@kaizenspark.com", "dev123", "developer"),
-            ("Intern Alpha", "intern@intern.kaizenspark.com", "intern123", "intern"),
-            ("Mentor One", "mentor@kaizenspark.com", "mentor123", "mentor"),
-            ("Demo Client", "client@example.com", "client123", "client"),
-            ("Finance Head", "finance@kaizenspark.com", "finance123", "finance"),
-        ]
+        # Only seed the Super Admin (company owner)
+        if not get_user_by_email(db, "admin@kaizenspark.com"):
+            create_user(db, UserCreate(
+                name="Super Admin",
+                email="admin@kaizenspark.com",
+                password="admin123",
+                role="super_admin",
+            ))
 
-        for name, email, password, role in seed_users:
-            if not get_user_by_email(db, email):
-                create_user(db, UserCreate(name=name, email=email, password=password, role=role))
-
-        # Create sample department & team
+        # Create sample departments
         from app.models.department import Department
         from app.models.team import Team
         if not db.query(Department).first():
-            dept = Department(name="Engineering", description="Software Engineering Department")
-            db.add(dept)
+            eng = Department(name="Engineering", description="Software Engineering Department")
+            mkt = Department(name="Marketing", description="Marketing & Growth")
+            hr_dept = Department(name="Human Resources", description="HR & People Operations")
+            db.add_all([eng, mkt, hr_dept])
             db.commit()
-            db.refresh(dept)
+            db.refresh(eng)
 
-            team = Team(name="Platform Team", description="Core platform development", department_id=dept.id)
+            team = Team(name="Platform Team", description="Core platform development", department_id=eng.id)
             db.add(team)
             db.commit()
 
-        # Create sample project
-        from app.models.project import Project
-        if not db.query(Project).first():
-            project = Project(
-                title="KaizenSpark Website Redesign",
-                description="Complete redesign of the corporate website with modern UI/UX",
-                client_id=11,  # Demo Client
-                status="in_progress",
-                priority="high",
-            )
-            db.add(project)
-            db.commit()
-            db.refresh(project)
-
-            from app.models.milestone import Milestone
-            m1 = Milestone(project_id=project.id, title="UI Design", description="Create wireframes and mockups", progress=80)
-            m2 = Milestone(project_id=project.id, title="Frontend Development", description="Implement React components", progress=45)
-            m3 = Milestone(project_id=project.id, title="Backend Integration", description="Connect API endpoints", progress=20)
-            db.add_all([m1, m2, m3])
-            db.commit()
-
-            from app.models.invoice import Invoice
-            inv = Invoice(project_id=project.id, amount=50000, status="unpaid")
-            db.add(inv)
-            db.commit()
-
-        return {"message": "Seed data created successfully — 12 roles seeded"}
+        return {
+            "message": "Seed complete — Super Admin created (admin@kaizenspark.com / admin123). Log in to start onboarding employees.",
+        }
     finally:
         db.close()
