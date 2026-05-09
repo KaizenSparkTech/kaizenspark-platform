@@ -21,7 +21,17 @@ Once the containers are healthy, you **must** seed the initial Super Admin (Comp
 curl -X POST http://localhost:8000/api/v1/dev/seed
 ```
 
-### 4. Access the Platform
+### 4. Rebuilding after changes
+If you make changes to the source code and want to see them reflected in the Docker containers:
+```bash
+# Rebuild and restart only the services that changed
+docker-compose up --build -d
+
+# To rebuild and restart a specific service (e.g. the API)
+docker-compose up --build -d api
+```
+
+### 5. Access the Platform
 - **Frontend Portal:** [http://localhost](http://localhost) (Port 80)
 - **API Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
 - **MinIO Console:** [http://localhost:9001](http://localhost:9001)
