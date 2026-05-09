@@ -38,4 +38,5 @@ apps/web/.vite/
 # IDE
 .idea/
 .vscode/
-Thumbs.db
+Thumbs.db*.db
+*.zip
