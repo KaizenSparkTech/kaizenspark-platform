@@ -126,6 +126,8 @@ def send_offer_letter(db: Session, offer_id: int, sent_by_user_id: int):
         department_id=offer.department_id,
         designation_id=offer.designation_id,
         date_of_joining=offer.joining_date,
+        employment_type=offer.employment_type,
+        internship_end_date=offer.internship_end_date,
     )
     db.add(new_user)
     db.flush()  # Get the user ID without committing

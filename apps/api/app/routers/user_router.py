@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.schemas.user_schema import UserCreate, UserResponse, UserUpdate, UserOnboardingUpdate
-from app.services.user_service import create_user, get_users, get_user_by_id, update_user, update_user_profile, approve_onboarding
+from app.services.user_service import create_user, get_users, get_user_by_id, update_user, update_user_profile, approve_onboarding, convert_to_full_time
 from app.database.connection import get_db
 from app.auth_dependencies import get_current_user, require_role
 from app.models.user import User
@@ -79,6 +79,19 @@ def approve_user_onboarding(
 ):
     """Approve a user's onboarding — sets them to active and verified."""
     result = approve_onboarding(db, user_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    return result
+
+
+@router.post("/{user_id}/convert-to-full-time", response_model=UserResponse)
+def convert_user_to_full_time(
+    user_id: int,
+    db: Session = Depends(get_db),
+    _current_user=Depends(require_role("super_admin", "hr")),
+):
+    """Convert an intern to a full-time employee."""
+    result = convert_to_full_time(db, user_id)
     if not result:
         raise HTTPException(status_code=404, detail="User not found")
     return result

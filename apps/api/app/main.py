@@ -32,6 +32,7 @@ from app.routers.department_router import router as department_router
 from app.routers.designation_router import router as designation_router
 from app.routers.team_router import router as team_router
 from app.routers.audit_log_router import router as audit_log_router
+from app.routers.system_setting_router import router as system_setting_router
 
 # --- Phase 2: HR Module ---
 from app.routers.offer_letter_router import router as offer_letter_router
@@ -55,6 +56,7 @@ from app.models import (  # noqa: F401
     offer_letter, onboarding_checklist, attendance, leave_request, leave_balance,
     project_request, approval,
     notification, timesheet, performance_review, payroll,
+    system_setting,
 )
 
 settings = get_settings()
@@ -98,6 +100,7 @@ app.include_router(user_router, prefix=api_prefix)
 app.include_router(department_router, prefix=api_prefix)
 app.include_router(designation_router, prefix=api_prefix)
 app.include_router(team_router, prefix=api_prefix)
+app.include_router(system_setting_router, prefix=api_prefix)
 
 # Projects & Tasks
 app.include_router(project_router, prefix=api_prefix)

@@ -38,6 +38,8 @@ def review_project_request(db: Session, request_id: int, data: ProjectRequestRev
         request.reviewed_by = reviewer_id
     if data.status == "approved":
         request.approved_by = reviewer_id
+        if hasattr(data, 'allocated_department_id') and data.allocated_department_id:
+            request.allocated_department_id = data.allocated_department_id
     db.commit()
     db.refresh(request)
     return request

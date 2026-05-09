@@ -92,3 +92,15 @@ def change_password(db: Session, user_id: int, old_password: str, new_password: 
     user.temp_password_changed = True
     db.commit()
     return {"message": "Password changed successfully"}
+
+
+def convert_to_full_time(db: Session, user_id: int) -> User | None:
+    """Admin/HR converts an intern to a full-time employee."""
+    user = get_user_by_id(db, user_id)
+    if not user:
+        return None
+    user.employment_type = "full_time"
+    user.internship_end_date = None
+    db.commit()
+    db.refresh(user)
+    return user
