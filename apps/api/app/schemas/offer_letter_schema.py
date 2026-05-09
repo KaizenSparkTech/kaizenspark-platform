@@ -50,6 +50,16 @@ class OfferLetterResponse(BaseModel):
     sent_by: Optional[int] = None
     accepted_at: Optional[datetime] = None
     signature_text: Optional[str] = None
+    generated_user_id: Optional[int] = None
+    generated_email: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class SendOfferResponse(BaseModel):
+    """Returned when an offer is sent — includes generated credentials (shown once)."""
+    offer: OfferLetterResponse
+    generated_email: str
+    generated_password: str  # plain text, shown to admin once
+    message: str

@@ -11,7 +11,7 @@ class OfferLetter(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     candidate_name = Column(String(100), nullable=False)
-    candidate_email = Column(String(100), nullable=False)
+    candidate_email = Column(String(100), nullable=False)  # candidate's real email (Gmail etc.)
     role_offered = Column(String(50), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True)
     designation_id = Column(Integer, ForeignKey("designations.id", ondelete="SET NULL"), nullable=True)
@@ -24,6 +24,11 @@ class OfferLetter(Base):
     sent_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     accepted_at = Column(DateTime(timezone=True), nullable=True)
     signature_text = Column(String(200), nullable=True)  # E-signature text
+
+    # Auto-provisioned user account (created when offer is sent)
+    generated_user_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    generated_email = Column(String(100), nullable=True)  # e.g. firstname@kaizenspark.com
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
@@ -31,3 +36,4 @@ class OfferLetter(Base):
     sender = relationship("User", foreign_keys=[sent_by])
     department = relationship("Department", foreign_keys=[department_id])
     designation = relationship("Designation", foreign_keys=[designation_id])
+    generated_user = relationship("User", foreign_keys=[generated_user_id])

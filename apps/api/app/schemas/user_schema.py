@@ -20,6 +20,7 @@ class UserCreate(BaseModel):
 
 
 class UserRegister(BaseModel):
+    """Public registration — for client/guest users only."""
     name: str
     email: EmailStr
     password: str
@@ -31,6 +32,7 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
+    """Admin/HR can update any user field."""
     name: Optional[str] = None
     phone: Optional[str] = None
     avatar_url: Optional[str] = None
@@ -43,6 +45,24 @@ class UserUpdate(BaseModel):
     date_of_joining: Optional[date] = None
     status: Optional[str] = None
     is_verified: Optional[bool] = None
+    onboarding_status: Optional[str] = None
+
+
+class UserOnboardingUpdate(BaseModel):
+    """Self-service profile update during onboarding."""
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+
+
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str
 
 
 class UserResponse(BaseModel):
@@ -60,6 +80,16 @@ class UserResponse(BaseModel):
     date_of_joining: Optional[date] = None
     status: str = "active"
     is_verified: bool = False
+    # Personal / onboarding fields
+    personal_email: Optional[str] = None
+    address: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    github_url: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    onboarding_status: str = "none"
+    temp_password_changed: bool = True
     created_at: datetime
 
     model_config = {"from_attributes": True}

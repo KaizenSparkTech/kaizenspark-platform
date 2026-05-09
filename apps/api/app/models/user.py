@@ -1,6 +1,6 @@
 """User model — expanded for enterprise ERP with 12 roles."""
 
-from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, ForeignKey, Text, func
 from sqlalchemy.orm import relationship
 
 from app.database.connection import Base
@@ -25,8 +25,19 @@ class User(Base):
     avatar_url = Column(String(500), nullable=True)
     employee_id = Column(String(20), unique=True, nullable=True)  # KS-EMP-001
     date_of_joining = Column(Date, nullable=True)
-    status = Column(String(20), default="active")  # active, inactive, terminated, on_leave
+    status = Column(String(20), default="active")  # active, onboarding, inactive, terminated, on_leave
     is_verified = Column(Boolean, default=False)
+
+    # Personal / onboarding details
+    personal_email = Column(String(100), nullable=True)  # candidate's real email (Gmail etc.)
+    address = Column(Text, nullable=True)
+    date_of_birth = Column(Date, nullable=True)
+    github_url = Column(String(300), nullable=True)
+    linkedin_url = Column(String(300), nullable=True)
+    emergency_contact_name = Column(String(100), nullable=True)
+    emergency_contact_phone = Column(String(20), nullable=True)
+    onboarding_status = Column(String(20), default="none")  # none, pending, in_progress, completed, approved
+    temp_password_changed = Column(Boolean, default=True)  # False for auto-created users
 
     # Organization hierarchy
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"), nullable=True)
