@@ -81,6 +81,10 @@ class ApiClient {
     return this.request<UserResponse>(`/users/${userId}/approve-onboarding`, { method: "POST" });
   }
 
+  async convertToFullTime(userId: number) {
+    return this.request<UserResponse>(`/users/${userId}/convert-to-full-time`, { method: "POST" });
+  }
+
   async getDepartments() {
     return this.request<any[]>("/departments/");
   }
@@ -89,8 +93,35 @@ class ApiClient {
     return this.request<any[]>("/teams/");
   }
 
-  async getDesignations() {
-    return this.request<any[]>("/designations/");
+  // Departments
+  async createDepartment(data: { name: string; description?: string }) {
+    return this.request<any>("/departments/", { method: "POST", body: data });
+  }
+
+  async updateDepartment(id: number, data: any) {
+    return this.request<any>(`/departments/${id}`, { method: "PUT", body: data });
+  }
+
+  async deleteDepartment(id: number) {
+    return this.request<any>(`/departments/${id}`, { method: "DELETE" });
+  }
+
+  // Designations
+  async getDesignations(departmentId?: number) {
+    const params = departmentId ? `?department_id=${departmentId}` : "";
+    return this.request<any[]>(`/designations/${params}`);
+  }
+
+  async createDesignation(data: { title: string; department_id: number; description?: string }) {
+    return this.request<any>("/designations/", { method: "POST", body: data });
+  }
+
+  async updateDesignation(id: number, data: any) {
+    return this.request<any>(`/designations/${id}`, { method: "PUT", body: data });
+  }
+
+  async deleteDesignation(id: number) {
+    return this.request<any>(`/designations/${id}`, { method: "DELETE" });
   }
 
   // --- Projects ---
@@ -125,6 +156,36 @@ class ApiClient {
 
   async rejectProjectRequest(id: number, reason?: string) {
     return this.request<ProjectRequestResponse>(`/project-requests/${id}/reject`, { method: "POST", body: { rejection_reason: reason } });
+  }
+
+  // --- Leads ---
+  async getLeads() {
+    return this.request<LeadResponse[]>("/leads/");
+  }
+
+  async submitLead(data: { name: string; email: string; message: string }) {
+    return this.request<LeadResponse>("/leads/", { method: "POST", body: data });
+  }
+
+  async inviteLead(id: number) {
+    return this.request<LeadInviteResponse>(`/leads/${id}/invite`, { method: "POST" });
+  }
+
+  // --- Settings ---
+  async getSettings() {
+    return this.request<SystemSettingResponse[]>("/settings/");
+  }
+
+  async getSetting(key: string) {
+    return this.request<SystemSettingResponse>(`/settings/${key}`);
+  }
+
+  async createSetting(data: { key: string; value: string; description?: string }) {
+    return this.request<SystemSettingResponse>("/settings/", { method: "POST", body: data });
+  }
+
+  async updateSetting(id: number, data: Partial<SystemSettingResponse>) {
+    return this.request<SystemSettingResponse>(`/settings/${id}`, { method: "PUT", body: data });
   }
 
   // --- HR: Offer Letters ---
@@ -200,6 +261,8 @@ export interface UserResponse {
   team_id?: number;
   reporting_to?: number;
   date_of_joining?: string;
+  employment_type?: string;
+  internship_end_date?: string;
   status: string;
   is_verified: boolean;
   personal_email?: string;
@@ -254,6 +317,8 @@ export interface OfferLetterResponse {
   candidate_name: string;
   candidate_email: string;
   role_offered: string;
+  employment_type?: string;
+  internship_end_date?: string;
   salary_offered: number;
   status: string;
   generated_user_id?: number;
@@ -293,6 +358,30 @@ export interface InvoiceResponse {
   amount: number;
   status: string;
   issued_date?: string;
+}
+
+export interface LeadResponse {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  status: string;
+  created_at: string;
+}
+
+export interface LeadInviteResponse {
+  lead: LeadResponse;
+  generated_email: string;
+  generated_password: string;
+  message: string;
+}
+
+export interface SystemSettingResponse {
+  id: number;
+  key: string;
+  value: string;
+  description?: string;
+  updated_at: string;
 }
 
 export const api = new ApiClient();
