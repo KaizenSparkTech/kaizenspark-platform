@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ error?: string }>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -17,15 +18,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem("kaizen_token"));
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchUser = async () => {
+    try {
+      const u = await api.getMe();
+      setUser(u as UserResponse);
+    } catch {
+      localStorage.removeItem("kaizen_token");
+      setToken(null);
+      setUser(null);
+    }
+  };
+
   useEffect(() => {
     if (token) {
-      api.getMe()
-        .then((u) => setUser(u))
-        .catch(() => {
-          localStorage.removeItem("kaizen_token");
-          setToken(null);
-        })
-        .finally(() => setIsLoading(false));
+      fetchUser().finally(() => setIsLoading(false));
     } else {
       setIsLoading(false);
     }
@@ -34,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       const result = await api.login({ email, password });
-      if (result.error) return { error: result.error };
+      if ((result as any).error) return { error: (result as any).error };
       localStorage.setItem("kaizen_token", result.access_token);
       setToken(result.access_token);
       setUser(result.user);
@@ -47,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (name: string, email: string, password: string) => {
     try {
       const result = await api.register({ name, email, password });
-      if (result.error) return { error: result.error };
+      if ((result as any).error) return { error: (result as any).error };
       localStorage.setItem("kaizen_token", result.access_token);
       setToken(result.access_token);
       setUser(result.user);
@@ -63,8 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    await fetchUser();
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

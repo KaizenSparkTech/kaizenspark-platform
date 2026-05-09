@@ -56,9 +56,29 @@ class ApiClient {
     return this.request<UserResponse>("/auth/me");
   }
 
+  async changePassword(old_password: string, new_password: string) {
+    return this.request<{ message: string }>("/auth/change-password", { method: "POST", body: { old_password, new_password } });
+  }
+
   // --- Users & Org ---
   async getUsers() {
     return this.request<UserResponse[]>("/users/");
+  }
+
+  async getUser(id: number) {
+    return this.request<UserResponse>(`/users/${id}`);
+  }
+
+  async updateMyProfile(data: Partial<UserOnboardingUpdate>) {
+    return this.request<UserResponse>("/users/me/profile", { method: "PUT", body: data });
+  }
+
+  async updateUser(id: number, data: Partial<UserResponse>) {
+    return this.request<UserResponse>(`/users/${id}`, { method: "PUT", body: data });
+  }
+
+  async approveOnboarding(userId: number) {
+    return this.request<UserResponse>(`/users/${userId}/approve-onboarding`, { method: "POST" });
   }
 
   async getDepartments() {
@@ -90,6 +110,23 @@ class ApiClient {
     return this.request<{ message: string }>(`/projects/${id}`, { method: "DELETE" });
   }
 
+  // --- Project Requests (Client submits, Admin approves) ---
+  async getProjectRequests() {
+    return this.request<ProjectRequestResponse[]>("/project-requests/");
+  }
+
+  async createProjectRequest(data: { title: string; description?: string; proposed_budget?: number; expected_deadline?: string; priority?: string }) {
+    return this.request<ProjectRequestResponse>("/project-requests/", { method: "POST", body: data });
+  }
+
+  async approveProjectRequest(id: number) {
+    return this.request<ProjectRequestResponse>(`/project-requests/${id}/approve`, { method: "POST" });
+  }
+
+  async rejectProjectRequest(id: number, reason?: string) {
+    return this.request<ProjectRequestResponse>(`/project-requests/${id}/reject`, { method: "POST", body: { rejection_reason: reason } });
+  }
+
   // --- HR: Offer Letters ---
   async getOfferLetters() {
     return this.request<OfferLetterResponse[]>("/offer-letters/");
@@ -100,7 +137,7 @@ class ApiClient {
   }
 
   async sendOfferLetter(id: number) {
-    return this.request<OfferLetterResponse>(`/offer-letters/${id}/send`, { method: "POST" });
+    return this.request<SendOfferResponse>(`/offer-letters/${id}/send`, { method: "POST" });
   }
 
   async acceptOfferLetter(id: number, signature_text: string) {
@@ -108,8 +145,13 @@ class ApiClient {
   }
 
   // --- HR: Onboarding ---
-  async getOnboardingChecklists() {
-    return this.request<OnboardingChecklistResponse[]>("/onboarding/");
+  async getOnboardingChecklists(userId?: number) {
+    const params = userId ? `?user_id=${userId}` : "";
+    return this.request<OnboardingChecklistResponse[]>(`/onboarding/${params}`);
+  }
+
+  async createOnboardingTask(data: { user_id: number; task_title: string; task_description?: string }) {
+    return this.request<OnboardingChecklistResponse>("/onboarding/", { method: "POST", body: data });
   }
 
   async updateOnboardingTask(id: number, status: string) {
@@ -133,6 +175,15 @@ class ApiClient {
   async seedData() {
     return this.request<{ message: string }>("/dev/seed", { method: "POST" });
   }
+
+  // --- Milestones & Invoices ---
+  async getMilestones() {
+    return this.request<MilestoneResponse[]>("/milestones/");
+  }
+
+  async getInvoices() {
+    return this.request<InvoiceResponse[]>("/invoices/");
+  }
 }
 
 // --- Types ---
@@ -141,7 +192,37 @@ export interface UserResponse {
   name: string;
   email: string;
   role: string;
+  phone?: string;
+  avatar_url?: string;
+  employee_id?: string;
+  department_id?: number;
+  designation_id?: number;
+  team_id?: number;
+  reporting_to?: number;
+  date_of_joining?: string;
+  status: string;
+  is_verified: boolean;
+  personal_email?: string;
+  address?: string;
+  date_of_birth?: string;
+  github_url?: string;
+  linkedin_url?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  onboarding_status: string;
+  temp_password_changed: boolean;
   created_at: string;
+}
+
+export interface UserOnboardingUpdate {
+  name?: string;
+  phone?: string;
+  address?: string;
+  date_of_birth?: string;
+  github_url?: string;
+  linkedin_url?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
 }
 
 export interface ProjectResponse {
@@ -150,8 +231,22 @@ export interface ProjectResponse {
   title: string;
   description?: string;
   status: string;
+  team_id?: number;
   created_at: string;
   updated_at?: string;
+}
+
+export interface ProjectRequestResponse {
+  id: number;
+  client_id: number;
+  title: string;
+  description?: string;
+  proposed_budget?: number;
+  expected_deadline?: string;
+  priority?: string;
+  status: string;
+  rejection_reason?: string;
+  created_at: string;
 }
 
 export interface OfferLetterResponse {
@@ -161,15 +256,43 @@ export interface OfferLetterResponse {
   role_offered: string;
   salary_offered: number;
   status: string;
+  generated_user_id?: number;
+  generated_email?: string;
   created_at: string;
   accepted_at?: string;
 }
 
+export interface SendOfferResponse {
+  offer: OfferLetterResponse;
+  generated_email: string;
+  generated_password: string;
+  message: string;
+}
+
 export interface OnboardingChecklistResponse {
   id: number;
+  user_id: number;
   task_title: string;
+  task_description?: string;
   status: string;
   due_date?: string;
+  completed_at?: string;
+}
+
+export interface MilestoneResponse {
+  id: number;
+  project_id: number;
+  title: string;
+  description?: string;
+  progress: number;
+}
+
+export interface InvoiceResponse {
+  id: number;
+  project_id: number;
+  amount: number;
+  status: string;
+  issued_date?: string;
 }
 
 export const api = new ApiClient();
