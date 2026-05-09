@@ -1,0 +1,22 @@
+import { useEffect, useState } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
+
+const ScrollProgress = () => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 origin-left z-[100000]"
+      style={{ scaleX }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 blur-sm opacity-50" />
+    </motion.div>
+  );
+};
+
+export default ScrollProgress;

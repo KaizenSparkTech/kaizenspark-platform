@@ -39,3 +39,7 @@ apps/web/.vite/
 .idea/
 .vscode/
 Thumbs.db
+*.db
+*.db-shm
+*.db-wal
+*.zip

@@ -1,17 +1,20 @@
 from pydantic import BaseModel
-from datetime import datetime
 from typing import Optional
+from datetime import datetime, date
+
 
 class CertificateCreate(BaseModel):
+    intern_id: int
     title: str
-    description: Optional[str] = None
-    issued_date: Optional[datetime] = None
+    certificate_url: Optional[str] = None
+
 
 class CertificateResponse(BaseModel):
     id: int
+    intern_id: int
     title: str
-    description: Optional[str] = None
-    issued_date: datetime
+    certificate_url: Optional[str] = None
+    issued_date: Optional[date] = None
+    created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

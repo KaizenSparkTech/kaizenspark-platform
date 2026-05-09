@@ -1,24 +1,48 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+"""
+Database connection module.
+Supports both PostgreSQL (production) and SQLite (local dev) via DATABASE_URL.
+"""
 
-# Database URL configuration
-# Note: This will be replaced by environment variables in production
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost:5433/kaizenspark"
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-# SQLAlchemy engine initialization
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+from app.config import get_settings
 
-# Session factory for database transactions
+settings = get_settings()
+
+# Engine configuration
+connect_args = {}
+if settings.is_sqlite:
+    connect_args["check_same_thread"] = False
+
+engine = create_engine(
+    settings.DATABASE_URL,
+    connect_args=connect_args,
+    echo=settings.APP_ENV == "development",
+)
+
+# Enable WAL mode and foreign keys for SQLite
+if settings.is_sqlite:
+    @event.listens_for(engine, "connect")
+    def _set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+# Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for declarative ORM models
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """Base class for all ORM models."""
+    pass
+
 
 def get_db():
     """
-    Database dependency to be used in FastAPI path operations.
-    Ensures a new session is created per request and closed upon completion.
+    Database dependency for FastAPI path operations.
+    Creates a new session per request and closes it upon completion.
     """
     db = SessionLocal()
     try:
